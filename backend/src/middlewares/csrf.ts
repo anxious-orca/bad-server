@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from 'express'
 import ForbiddenError from '../errors/forbidden-error'
 
 const CSRF_SECRET = process.env.CSRF_SECRET || crypto.randomBytes(32).toString('hex')
-const CSRF_COOKIE_NAME = 'csrf'
+const CSRF_COOKIE_NAME = '_csrf'
 
 function generateToken(): string {
   return crypto.randomBytes(32).toString('hex')
