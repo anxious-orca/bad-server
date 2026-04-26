@@ -1,3 +1,5 @@
+https://github.com/anxious-orca/bad-server
+
 # Проектная работа "WebLarek. Плохой сервер.", спринт 17
 
 ## Подготовка к работе
