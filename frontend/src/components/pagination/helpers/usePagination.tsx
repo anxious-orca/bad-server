@@ -16,7 +16,7 @@ interface PaginationResult<_, U> {
 }
 
 const usePagination = <T, U>(
-    asyncAction: AsyncThunk<T, Record<string, unknown>, any>,
+    asyncAction: AsyncThunk<T, Record<string, unknown>, Record<string, unknown>>,
     selector: (state: RootState) => U[],
     defaultLimit: number
 ): PaginationResult<T, U> => {
@@ -32,8 +32,8 @@ const usePagination = <T, U>(
 
     const limit = Number(searchParams.get('limit')) || defaultLimit
 
-    const fetchData = async (params: Record<string, any>) => {
-        const response: any = await dispatch(asyncAction(params))
+    const fetchData = async (params: Record<string, unknown>) => {
+        const response = await dispatch(asyncAction(params)) as { payload: { pagination: { totalPages: number } } }
         setTotalPages(response.payload.pagination.totalPages)
     }
 
@@ -46,12 +46,11 @@ const usePagination = <T, U>(
         })
     }, [currentPage, limit, searchParams])
 
-    const updateURL = (newParams: Record<string, any>) => {
-        3
+    const updateURL = (newParams: Record<string, unknown>) => {
         const updatedParams = new URLSearchParams(searchParams)
         Object.entries(newParams).forEach(([key, value]) => {
-            if (value !== undefined) {
-                updatedParams.set(key, value.toString())
+            if (value !== undefined && value !== null) {
+            updatedParams.set(key, String(value))
             } else {
                 updatedParams.delete(key)
             }

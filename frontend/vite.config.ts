@@ -18,7 +18,7 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: (source: string, filepath: string) => {
+        additionalData: (source: string) => {
           return `
             @use "${resolve(__dirname, 'src/scss/variables')}" as *;
             @use "${resolve(__dirname, 'src/scss/mixins')}";
