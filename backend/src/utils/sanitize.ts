@@ -4,7 +4,7 @@ const MAX_LIMIT = 10
 
 export function setSafeLimit(raw: unknown): number {
   const n = Number(raw)
-  if (isNaN(n) || n < 1) return MAX_LIMIT
+  if (Number.isNaN(n) || n < 1) return MAX_LIMIT
   return Math.min(n, MAX_LIMIT)
 }
 

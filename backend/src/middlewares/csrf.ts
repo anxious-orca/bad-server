@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from 'express'
 import ForbiddenError from '../errors/forbidden-error'
 
 const CSRF_SECRET = process.env.CSRF_SECRET || crypto.randomBytes(32).toString('hex')
+const CSRF_COOKIE_NAME = 'csrf'
 
 function generateToken(): string {
   return crypto.randomBytes(32).toString('hex')
@@ -16,11 +17,11 @@ function signToken(token: string): string {
 }
 
 export function csrfTokenHandler(req: Request, res: Response): void {
-  const existing = req.cookies?.['_csrf']
+  const existing = req.cookies?.[CSRF_COOKIE_NAME]
   const token = existing || generateToken()
 
   if (!existing) {
-    res.cookie('_csrf', token, {
+    res.cookie(CSRF_COOKIE_NAME, token, {
       httpOnly: true,
       sameSite: 'strict',
       secure: process.env.NODE_ENV === 'production',
@@ -31,7 +32,7 @@ export function csrfTokenHandler(req: Request, res: Response): void {
 }
 
 export function csrfProtection(req: Request, _res: Response, next: NextFunction): void {
-  const cookieToken = req.cookies?.['_csrf']
+  const cookieToken = req.cookies?.[CSRF_COOKIE_NAME]
   const headerToken = req.headers['x-csrf-token'] as string | undefined
 
   if (!cookieToken || !headerToken) {
