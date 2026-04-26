@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { csrfTokenHandler } from '../middlewares/csrf'
 import {
     getCurrentUser,
     getCurrentUserRoles,
@@ -12,6 +13,7 @@ import auth from '../middlewares/auth'
 
 const authRouter = Router()
 
+authRouter.get('/csrf-token', csrfTokenHandler)
 authRouter.get('/user', auth, getCurrentUser)
 authRouter.patch('/me', auth, updateCurrentUser)
 authRouter.get('/user/roles', auth, getCurrentUserRoles)
