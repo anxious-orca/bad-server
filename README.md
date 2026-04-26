@@ -1,5 +1,9 @@
 https://github.com/anxious-orca/bad-server
 
+Юрий
+Фулстек-разработчик
+wff-cohort-41
+
 # Проектная работа "WebLarek. Плохой сервер.", спринт 17
 
 ## Подготовка к работе
