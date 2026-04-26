@@ -8,7 +8,7 @@ import {
     REHYDRATE,
 } from 'redux-persist'
 
-import persistStore from 'redux-persist/es/persistStore'
+import { persistStore } from 'redux-persist'
 import weblarekApi from '../utils/weblarek-api'
 import { rootReducer } from './rootReducer'
 const store = configureStore({

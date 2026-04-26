@@ -5,8 +5,8 @@ import { ordersSlice } from '@slices/orders/orders-slice'
 import { productsSlice } from '@slices/products/products-slice'
 import { profileOrdersSlice } from '@slices/profile-orders/profile-orders-slice'
 import { userSlice } from '@slices/user/user-slice'
-import persistReducer from 'redux-persist/es/persistReducer'
-import storage from 'redux-persist/lib/storage'
+import { persistReducer } from 'redux-persist'
+import storage from './storage'
 import basketSlice from './slice/basket'
 
 const persistConfigBasket = {
