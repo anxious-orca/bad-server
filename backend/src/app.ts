@@ -9,6 +9,7 @@ import { DB_ADDRESS } from './config'
 import errorHandler from './middlewares/error-handler'
 import serveStatic from './middlewares/serverStatic'
 import routes from './routes'
+import { csrfProtection } from './middlewares/csrf'
 
 const { PORT = 3000 } = process.env
 const app = express()
@@ -23,6 +24,11 @@ app.use(serveStatic(path.join(__dirname, 'public')))
 
 app.use(urlencoded({ extended: true }))
 app.use(json())
+
+app.post('*', csrfProtection)
+app.put('*', csrfProtection)
+app.patch('*', csrfProtection)
+app.delete('*', csrfProtection)
 
 app.options('*', cors())
 app.use(routes)
