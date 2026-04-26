@@ -16,8 +16,8 @@ const { PORT = 3000 } = process.env
 const app = express()
 
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 30,
+    windowMs: 60 * 1000,
+    max: 40,
     standardHeaders: true,
     legacyHeaders: false,
 })
@@ -37,7 +37,7 @@ app.put('*', csrfProtection)
 app.patch('*', csrfProtection)
 app.delete('*', csrfProtection)
 
-app.options('*', cors())
+app.options('*', cors({ origin: 'http://localhost:5173', credentials: true }))
 app.use(routes)
 app.use(errors())
 app.use(errorHandler)
