@@ -3,53 +3,56 @@ import { NextFunction, Request, Response } from 'express'
 import ForbiddenError from '../errors/forbidden-error'
 
 const CSRF_SECRET = process.env.CSRF_SECRET || crypto.randomBytes(32).toString('hex')
-const TOKEN_TTL_MS = 1000 * 60 * 60 // 1 hour
-
-interface CsrfPayload {
-  ts: number
-  sig: string
-}
 
 function generateToken(): string {
-  const ts = Date.now()
-  const sig = crypto
+  return crypto.randomBytes(32).toString('hex')
+}
+
+function signToken(token: string): string {
+  return crypto
     .createHmac('sha256', CSRF_SECRET)
-    .update(String(ts))
+    .update(token)
     .digest('hex')
-  const payload: CsrfPayload = { ts, sig }
-  return Buffer.from(JSON.stringify(payload)).toString('base64url')
 }
 
-function validateToken(token: string): boolean {
-  try {
-    const payload: CsrfPayload = JSON.parse(
-      Buffer.from(token, 'base64url').toString('utf8')
-    )
-    if (Date.now() - payload.ts > TOKEN_TTL_MS) return false
-    const expected = crypto
-      .createHmac('sha256', CSRF_SECRET)
-      .update(String(payload.ts))
-      .digest('hex')
-    
-    const expectedBytes = new Uint8Array(Buffer.from(expected, 'hex'))
-    const actualBytes = new Uint8Array(Buffer.from(payload.sig, 'hex'))
+export function csrfTokenHandler(req: Request, res: Response): void {
+  const existing = req.cookies?.['_csrf']
+  const token = existing || generateToken()
 
-    if (expectedBytes.length !== actualBytes.length) return false
-
-    return crypto.timingSafeEqual(expectedBytes, actualBytes)
-  } catch {
-    return false
+  if (!existing) {
+    res.cookie('_csrf', token, {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+    })
   }
-}
 
-export function csrfTokenHandler(_req: Request, res: Response): void {
-  res.json({ csrfToken: generateToken() })
+  res.json({ csrfToken: signToken(token) })
 }
 
 export function csrfProtection(req: Request, _res: Response, next: NextFunction): void {
-  const token = req.headers['x-csrf-token'] as string | undefined
-  if (!token || !validateToken(token)) {
+  const cookieToken = req.cookies?.['_csrf']
+  const headerToken = req.headers['x-csrf-token'] as string | undefined
+
+  if (!cookieToken || !headerToken) {
     return next(new ForbiddenError('Невалидный CSRF токен'))
   }
+
+  const expected = signToken(cookieToken)
+  const expectedBytes = new Uint8Array(Buffer.from(expected, 'hex'))
+  const actualBytes = new Uint8Array(Buffer.from(headerToken, 'hex'))
+
+  if (expectedBytes.length !== actualBytes.length) {
+    return next(new ForbiddenError('Невалидный CSRF токен'))
+  }
+
+  try {
+    if (!crypto.timingSafeEqual(expectedBytes, actualBytes)) {
+      return next(new ForbiddenError('Невалидный CSRF токен'))
+    }
+  } catch {
+    return next(new ForbiddenError('Невалидный CSRF токен'))
+  }
+
   return next()
 }
