@@ -28,7 +28,9 @@ export const useActionCreators = <Actions extends ActionCreatorsMapObject>(
 ): BoundActions<Actions> => {
     const dispatch = useDispatch()
 
-    return useMemo(() => bindActionCreators(actions, dispatch), [])
+    return useMemo(() => bindActionCreators(actions, dispatch), 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [])
 }
 
 export type BoundActions<Actions extends ActionCreatorsMapObject> = {

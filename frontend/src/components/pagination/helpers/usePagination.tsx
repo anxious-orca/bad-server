@@ -44,6 +44,7 @@ const usePagination = <T, U>(
                 setPage(1)
             }
         })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentPage, limit, searchParams])
 
     const updateURL = (newParams: Record<string, unknown>) => {
